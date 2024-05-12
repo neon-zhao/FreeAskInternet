@@ -1,0 +1,14 @@
+{
+  "SEARXNG_URL": "http://searxng:8080",
+  "models": [
+    {
+      "model_base_url": "http://llm-kimi:8000/v1/",
+      "model_names": "kimi"
+    },
+    {
+      "model_base_url": "http://192.168.27.37:11434/v1/",
+      "model_names": "qwen:7b,qwen14b"
+    }
+  ],
+  "RETURN_SEARCHINFO_FLAG": false
+}

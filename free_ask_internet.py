@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import json
-import os 
-from pprint import pprint
-import requests
-import trafilatura
-from trafilatura import bare_extraction
-from concurrent.futures import ThreadPoolExecutor
 import concurrent
-import requests
-import openai
-import time 
-from datetime import datetime
-from urllib.parse import urlparse
-import tldextract
-import platform
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
+from pprint import pprint
+from urllib.parse import urlparse
 
- 
+import openai
+import requests
+import tldextract
+import trafilatura
+
+
+
 def extract_url_content(url):
     downloaded = trafilatura.fetch_url(url)
     content =  trafilatura.extract(downloaded)
@@ -180,7 +175,9 @@ def chat(prompt, model:str,llm_auth_token:str,llm_base_url:str,using_custom_llm=
         openai.base_url = "http://llm-glm4:8000/v1/"
     if model == "qwen":
         openai.base_url = "http://llm-qwen:8000/v1/"
-    
+
+    if model == "qwen:7b" or model == "qwen:14b":
+        openai.base_url = "http://192.168.27.37:11434/v1/"
 
     if llm_auth_token == '':
         llm_auth_token = "CUSTOM"
@@ -214,15 +211,15 @@ def chat(prompt, model:str,llm_auth_token:str,llm_base_url:str,using_custom_llm=
 
  
     
-def ask_internet(query:str,  debug=False):
+def ask_internet(query:str, model:str,debug=False):
   
     content_list = search_web_ref(query,debug=debug)
     if debug:
         print(content_list)
     prompt = gen_prompt(query,content_list,context_length_limit=6000,debug=debug)
-    total_token =  ""
+    total_token = ""
  
-    for token in chat(prompt=prompt):
+    for token in chat(prompt=prompt,model=model,llm_auth_token='',llm_base_url='',using_custom_llm=False,stream=True,debug=False):
     # for token in daxianggpt.chat(prompt=prompt):
         if token:
             total_token += token

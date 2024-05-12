@@ -1,34 +1,30 @@
 # -*- coding: utf-8 -*-
 
 import time
+from typing import List, Literal, Optional, Union
+
 import uvicorn
-import sys
-import getopt
-import json
-import os 
-from pprint import pprint
-import requests
-import trafilatura
-from trafilatura import bare_extraction
-from concurrent.futures import ThreadPoolExecutor
-import concurrent
-import requests
-import openai
-import time 
-from datetime import datetime
-from urllib.parse import urlparse
-import platform
-import urllib.parse
-import free_ask_internet
-from pydantic import BaseModel, Field
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from typing import Any, Dict, List, Literal, Optional, Union
-from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+from sse_starlette.sse import EventSourceResponse
+
+import free_ask_internet
+import json
+
 
 app = FastAPI()
+# 读取配置文件
+with open('config.json', 'r') as f:
+    config = json.load(f)
+    print(config)
+    seraxng_url = config["seraxng_url"]
+    print("seraxng_url=",seraxng_url)
+
+
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -149,7 +145,7 @@ def predict(query: str, history: None, model_id: str):
     yield "{}".format(chunk.json(exclude_unset=True))
     new_response = ""
     current_length = 0
-    for token in free_ask_internet.ask_internet(query=query):
+    for token in free_ask_internet.ask_internet(query=query,model=model_id):
     
         new_response += token
         if len(new_response) == current_length:
@@ -258,7 +254,7 @@ def main():
     search_results = []
  
    
-    uvicorn.run(app, host='0.0.0.0', port=port, workers=1)
+    uvicorn.run(app, host='0.0.0.0', port=port, workers=1,log_level='debug')
 
 
 if __name__ == "__main__":
